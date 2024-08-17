@@ -1,5 +1,5 @@
 
-# My Project Traffic System
+# My Computer Vision Traffic System to aid data analytics without compromising popular data.
 
 ## Table of Contents
 - [Introduction](#introduction)
