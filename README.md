@@ -12,7 +12,7 @@
 - [Contact](#contact)
 
 ## Introduction
-This project is designed to mimic a traffic system using computer vision to create unique signatures of vehicles and provide data for analytics. It leverages Python and Docker to create an efficient and scalable solution. The project includes key modules for 
+This project is designed to mimic a traffic system using computer vision to create unique signatures of vehicles and provide data for analytics. It leverages Python and Docker to create an efficient and scalable solution. The project was built using Windows and VSCode, so the steps may not be 1:1 if you use a different OS. However the usage of docker should mitigate the build issues.
 .
 
 ## Features
@@ -58,21 +58,25 @@ These modules together form the core functionality of your project, allowing for
     ```sh
     git clone https://github.com/adithya7shankar/my-project-traffic-system.git
     ```
-2. Navigate to the project directory:
+2. Create a workspace that looks like this:
     ```sh
-    cd project-name
+    - requirements.txt
+    - main.py
+    - Dockerfile
+    - utils.py
     ```
-3. Build the Docker image:
+     
+3. Build the Docker image using devcontainers:
     ```sh
-    docker build -t project-name .
+    Run it by using devcontainers. 
+    -> CTRL+Shift+P or CMD+Shift+P  
+    -> Type "Remote-Containers: Reopen in Container"
+    -> Now copy the devcontainer.json from the repo and paste it into your devcontainer.json; this will add the extensions in vscode to aid development.
     ```
 4. Run the Docker container:
     ```sh
-    docker run -it project-name
-    ```
-Alternatively, to run the project without Docker:
-    ```sh
-    pip install -r requirements.txt
+    Run it by using devcontainers. 
+    To build your project, simply run the relevant commands within the VS Code terminal, which is now connected to the DevContainer.
     ```
 
 ## Usage
