@@ -91,7 +91,7 @@ This module contains helper functions that support the main script. You can modi
 Configurations can be adjusted in the `main.py` script or within Docker. For more complex setups, consider using environment variables or configuration files.
 
 ## Contributing
-We welcome contributions! To contribute, follow these steps:
+Every project has room for improvement, and this one is no exception. If you'd like to contribute, here’s how you can get involved:
 
 1. Fork the repository.
 2. Create a new branch:
