@@ -56,7 +56,7 @@ These modules together form the core functionality of your project, allowing for
 ### Steps
 1. Clone the repository:
     ```sh
-    git clone [https://github.com/adithya7shankar/my-project-traffic-system](https://github.com/adithya7shankar/my-project-traffic-system.git)
+    git clone https://github.com/adithya7shankar/my-project-traffic-system.git
     ```
 2. Navigate to the project directory:
     ```sh
