@@ -11,6 +11,7 @@
 - [Usage](#usage)
   - [Running with Docker](#running-with-docker)
   - [Running Locally](#running-locally)
+  - [Running Tests](#running-tests)
   - [Configuration Options](#configuration-options)
 - [Core Modules](#core-modules)
 - [Development](#development)
@@ -28,10 +29,12 @@ This project simulates a traffic monitoring system using computer vision techniq
 - **Privacy-Preserving Analytics**: Uses cryptographic signatures instead of identifiable information
 - **Dockerized Environment**: Easy containerization and deployment with an optimized Dockerfile
 - **Secure Cryptography**: Data encryption and decryption using Fernet symmetric encryption
-- **Data Visualization**: Visual analytics of vehicle speeds and traffic patterns
+- **Enhanced Data Visualization**: Multiple visualization types including speed histograms and vehicle size distributions
 - **Modular Architecture**: Well-structured code with separation of concerns
-- **Logging & Monitoring**: Comprehensive logging system for troubleshooting and auditing
+- **Comprehensive Logging**: Detailed logging system for troubleshooting and auditing
 - **Simulation Capabilities**: Run single or multi-iteration traffic simulations
+- **Unit Testing**: Comprehensive test suite to ensure code quality and reliability
+- **Type Hints**: Improved code readability and IDE support with Python type annotations
 
 ## System Architecture
 The system follows a modular design with these main components:
@@ -61,6 +64,12 @@ The system follows a modular design with these main components:
    docker run -p 80:80 traffic-system
    ```
 
+3. Access the output visualizations:
+   ```sh
+   # Mount volumes for persistent output and logs
+   docker run -p 80:80 -v $(pwd)/output:/app/output -v $(pwd)/logs:/app/logs traffic-system
+   ```
+
 ### Local Setup
 1. Clone the repository:
    ```sh
@@ -86,8 +95,8 @@ The system follows a modular design with these main components:
 # Run the default simulation
 docker run -p 80:80 traffic-system
 
-# Run with mounted volume for output visualization
-docker run -p 80:80 -v $(pwd)/output:/app/output traffic-system
+# Run with mounted volumes for output visualization and logs
+docker run -p 80:80 -v $(pwd)/output:/app/output -v $(pwd)/logs:/app/logs traffic-system
 ```
 
 ### Running Locally
@@ -99,12 +108,25 @@ python main.py
 python -c "from utils import run_simulation; run_simulation(iterations=5, num_vehicles_per_iteration=30)"
 ```
 
+### Running Tests
+```sh
+# Run all tests
+pytest
+
+# Run tests with coverage report
+pytest --cov=. --cov-report=term-missing
+
+# Run a specific test file
+pytest test_utils.py
+```
+
 ### Configuration Options
 The system can be configured by modifying parameters in the `main.py` file:
 
 - `num_vehicles`: Number of vehicles to simulate in a single run
 - `iterations`: Number of simulation iterations to run
 - `num_vehicles_per_iteration`: Number of vehicles per iteration
+- `processing_delay`: Adjust the simulated processing delay (in seconds)
 
 ## Core Modules
 
@@ -120,7 +142,8 @@ The system can be configured by modifying parameters in the `main.py` file:
 
 ### Visualization
 - **visualize_speed_distribution(analyzed_data)**: Creates histograms of vehicle speed distributions
-- **Output**: Visualization results are saved to PNG files for review
+- **visualize_vehicle_sizes(analyzed_data)**: Creates pie charts of vehicle size distributions
+- **Output**: Visualization results are saved to PNG files in the output directory
 
 ## Development
 
@@ -129,9 +152,10 @@ The system can be configured by modifying parameters in the `main.py` file:
 traffic-system/
 ├── Dockerfile             # Optimized container definition
 ├── README.md              # This documentation
-├── devcontainer.json      # VS Code DevContainer configuration
+├── .gitignore             # Git ignore configuration
 ├── main.py                # Main application entry point
 ├── requirements.txt       # Python dependencies
+├── test_utils.py          # Unit tests for utility functions
 ├── utils.py               # Core utility functions
 ├── logs/                  # Generated log files
 └── output/                # Generated visualizations
@@ -150,6 +174,8 @@ This system implements several security and privacy measures:
 - **Encryption**: All processed data is encrypted using Fernet symmetric encryption
 - **Key Management**: Encryption keys are generated and stored securely
 - **No Persistent Identifiers**: The system avoids storing any personally identifiable information
+- **Error Handling**: Improved error handling for cryptographic operations
+- **Secure File Operations**: Better handling of file operations with proper error handling
 
 ## Contributing
 Contributions are welcome! Here's how you can help:

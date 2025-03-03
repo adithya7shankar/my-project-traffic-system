@@ -1,47 +1,44 @@
-# Use an official Python runtime as a parent image
-FROM ubuntu:latest 
+# Use an official Python slim image as a parent image
+FROM python:3.9-slim
 
 # Set environment variables
-ENV TZ=US/Pacific \
-    DEBIAN_FRONTEND=noninteractive \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    TZ=US/Pacific
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Set arguments
-ARG PYVER="3.9"
-ARG GITUN="Adithya Shankar"
-ARG GITEMAIL="adithya7shankar@gmail.com"
+# Create a non-root user to run the application
+RUN groupadd -r appuser && useradd -r -g appuser appuser \
+    && mkdir -p /app/output /app/logs \
+    && chown -R appuser:appuser /app
 
-# Update and install dependencies in one layer to reduce image size
-RUN apt-get update && apt-get install -y \
-    software-properties-common \
-    git-all \
-    && add-apt-repository -y ppa:deadsnakes/ppa \
-    && apt-get update \
-    && apt-get install -y python${PYVER} \
-    python3-pip \
-    python3-cryptography \
-    python3-matplotlib \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libc6-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Configure Git
-RUN git config --global user.name "$GITUN" && \
-    git config --global user.email "$GITEMAIL" && \
-    git config --global init.defaultBranch main
-
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# Copy the application code
 COPY . .
+
+# Create output and logs directories and set permissions
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
+# Create volumes for persistent data
+VOLUME ["/app/output", "/app/logs"]
+
 # Run main.py when the container launches
-CMD ["python3", "main.py"]
+CMD ["python", "main.py"]
