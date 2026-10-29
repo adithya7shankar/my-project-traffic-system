@@ -1,6 +1,7 @@
 import hashlib
 import os
 import json
+import ast
 from typing import Dict, List, Union, Any, Optional
 from cryptography.fernet import Fernet
 import time
@@ -144,21 +145,26 @@ def process_data_in_real_time(data_stream: List[Dict[str, Any]],
             
     return processed_stream
 
-def generate_vehicle_data(num_vehicles: int) -> List[Dict[str, Any]]:
+def generate_vehicle_data(num_vehicles: int, *, rng: Optional[random.Random] = None) -> List[Dict[str, Any]]:
     """
     Simulate vehicle data generation for a given number of vehicles.
     
     Args:
         num_vehicles (int): Number of vehicles to simulate
+        rng (Optional[random.Random]): Optional random.Random instance for deterministic sampling.
+            If None, uses the global random module.
         
     Returns:
         List[Dict[str, Any]]: List of vehicle data dictionaries
     """
+    if rng is None:
+        rng = random
+
     vehicle_data = []
     for i in range(num_vehicles):
         device_id = f"vehicle_{i+1}"
-        speed = random.randint(30, 70)  # Random speed between 30-70 mph
-        size = random.choice(['compact', 'sedan', 'SUV', 'truck'])
+        speed = rng.randint(30, 70)  # Random speed between 30-70 mph
+        size = rng.choice(['compact', 'sedan', 'SUV', 'truck'])
         vehicle_data.append({
             'device_id': device_id, 
             'speed': speed,  # Store as integer for easier processing
@@ -221,6 +227,15 @@ def extract_speed(data: Union[Dict[str, Any], str]) -> int:
         
         # If data is a string (legacy support)
         elif isinstance(data, str):
+            try:
+                parsed = json.loads(data)
+            except (ValueError, TypeError):
+                try:
+                    parsed = ast.literal_eval(data)
+                except (ValueError, SyntaxError):
+                    parsed = None
+            if isinstance(parsed, dict):
+                return extract_speed(parsed)
             if "'speed':" in data:
                 speed_part = data.split("'speed':")[1].split(",")[0].strip()
                 speed_str = speed_part.replace("'", "").replace('"', '')
@@ -311,22 +326,28 @@ def visualize_vehicle_sizes(analyzed_data: List[Dict[str, Any]]) -> None:
     except Exception as e:
         logger.error(f"Error in vehicle size visualization: {e}")
 
-def run_simulation(iterations: int, num_vehicles_per_iteration: int) -> List[Dict[str, Any]]:
+def run_simulation(iterations: int, num_vehicles_per_iteration: int, *, seed: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Run multiple iterations of the vehicle data simulation, processing, and analysis.
     
     Args:
         iterations (int): Number of simulation iterations
         num_vehicles_per_iteration (int): Number of vehicles per iteration
+        seed (Optional[int]): Optional seed for deterministic vehicle data generation.
+            If provided, a local random.Random instance is created and reused.
+            If None, the global random module is used, preserving existing behavior.
+            Only speed/size sampling is reproducible; timestamps and ciphertext vary.
         
     Returns:
         List[Dict[str, Any]]: Combined analyzed data from all iterations
     """
     all_analyzed_data = []
     
+    local_rng = random.Random(seed) if seed is not None else None
+
     for i in range(iterations):
         logger.info(f"\n--- Simulation Iteration {i+1}/{iterations} ---")
-        vehicle_data = generate_vehicle_data(num_vehicles_per_iteration)
+        vehicle_data = generate_vehicle_data(num_vehicles_per_iteration, rng=local_rng)
         processed_data = simulate_sensor_data_processing(vehicle_data)
         analyzed_data = simulate_data_analysis(processed_data)
         all_analyzed_data.extend(analyzed_data)
