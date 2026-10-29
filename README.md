@@ -200,3 +200,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 Created by Adithya Shankar - feel free to contact me at [adithya7shankar@gmail.com](mailto:adithya7shankar@gmail.com).
+
+## Reproducing a synthetic workload
+
+```python
+from utils import run_simulation
+rows = run_simulation(iterations=3, num_vehicles_per_iteration=20, seed=7)
+```
+
+The seed fixes the sequence of vehicle speeds and sizes across all iterations,
+without changing Python's global random state. It does not fix timestamps,
+encryption keys, or Fernet ciphertext. Omitting `seed` keeps the original behavior.
+For a single generated batch, pass `rng=random.Random(7)` to
+`generate_vehicle_data`. Reuse that RNG across batches to advance the sequence.
+These are synthetic observations, not detections from a camera or evidence of
+real traffic performance.
